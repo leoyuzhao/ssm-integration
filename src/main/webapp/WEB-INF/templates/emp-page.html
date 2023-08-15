@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>员工列表</title>
+    <script th:src="@{/js/jquery-3.7.0.js}"></script>
+    <style>
+        table,
+        table td,
+        table th {
+            border: 1px solid #000000;
+        }
+
+        #pageOpBut a {
+            cursor: pointer;
+            text-decoration: underline;
+            color: blue;
+        }
+    </style>
+    <script>
+
+        // 当前页码
+        var currentPageNo = "[[${empPageInfo.pageNum}]]";
+        // 总页数
+        var pages = "[[${empPageInfo.pages}]]";
+
+        $(function () {
+
+        });
+
+        function queryByPage(op) {
+
+            var toPage = null;
+
+            if (op === "firstPage") {
+                // 首页
+                toPage = 1;
+            } else if (op === "nextPage") {
+                // 下一页
+                toPage = parseInt(currentPageNo) + 1;
+                if (toPage > pages) {
+                    toPage = pages;
+                }
+            } else if (op === "prePage") {
+                // 上一页
+                toPage = parseInt(currentPageNo) - 1;
+                if (toPage <= 0) {
+                    toPage = 1;
+                }
+            } else {
+                // 最后一页
+                toPage = pages;
+            }
+            window.location.href = "[[@{/emp/query/page}]]" + "?pageNo=" + toPage;
+        }
+
+    </script>
+</head>
+<body>
+
+<h1>员工列表</h1>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>NAME</th>
+        <th>SALARY</th>
+    </tr>
+    <tbody th:if="${#lists.isEmpty(empPageInfo.list)}">
+    <tr>
+        <td colspan="3">抱歉！没有查询到数据！</td>
+    </tr>
+    </tbody>
+    <tbody th:if="${not #lists.isEmpty(empPageInfo.list)}">
+    <tr th:each="emp:${empPageInfo.list}">
+        <td th:text="${emp.empId}"></td>
+        <td th:text="${emp.empName}"></td>
+        <td th:text="${emp.empSalary}"></td>
+    </tr>
+    </tbody>
+    <!-- 分页 -->
+    <tr id="pageOpBut" th:if="${not #lists.isEmpty(empPageInfo.list)}">
+        <td colspan="3">
+            <a onclick="queryByPage('firstPage')">首页</a>&nbsp;
+            <a onclick="queryByPage('prePage')">上一页</a>
+            &nbsp;[[${empPageInfo.pageNum}]]&nbsp;/&nbsp;[[${empPageInfo.pages}]]&nbsp;
+            <a onclick="queryByPage('nextPage')">下一页</a>&nbsp;
+            <a onclick="queryByPage('lastPage')">尾页</a>
+        </td>
+    </tr>
+</table>
+
+
+<a th:href="@{/}">回首页</a>
+</body>
+</html>
